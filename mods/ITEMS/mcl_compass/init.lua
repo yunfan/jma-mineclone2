@@ -281,7 +281,7 @@ minetest.register_craft({ --TODO: update once echo shards are a thing
 	output = "mcl_compass:" .. random_frame .. "_recovery",
 	recipe = {
 		{"","mcl_nether:netherite_ingot",""},
-		{"mcl_core:diamondblock","mcl_compass:" .. stereotype_frame ,"mcl_core:diamondblock"},
+		{"mcl_core:diamondblock","group:compass","mcl_core:diamondblock"},
 		{"mcl_core:diamondblock","mcl_core:diamondblock","mcl_core:diamondblock"}
 
 	}
@@ -312,8 +312,8 @@ minetest.register_node("mcl_compass:lodestone",{
 		"lodestone_side4.png"
 	},
 	groups = {pickaxey=1, material_stone=1},
-	_mcl_hardness = 1.5,
-	_mcl_blast_resistance = 6,
+	_mcl_hardness = 3.5,
+	_mcl_blast_resistance = 3.5,
 	sounds = mcl_sounds.node_sound_stone_defaults()
 })
 

@@ -8,7 +8,7 @@ minetest.register_craftitem("mcl_mobitems:rotten_flesh", {
 	wield_image = "mcl_mobitems_rotten_flesh.png",
 	on_place = minetest.item_eat(4),
 	on_secondary_use = minetest.item_eat(4),
-	groups = { food = 2, eatable = 4 },
+	groups = { food = 2, eatable = 4, fish_bait = 1 },
 	_mcl_saturation = 0.8,
 	stack_max = 64,
 })
@@ -86,69 +86,6 @@ minetest.register_craftitem("mcl_mobitems:cooked_chicken", {
 	stack_max = 64,
 })
 
--- DINO NUGGETS
-
-minetest.register_craftitem("mcl_mobitems:dino_nuggets_stegosaurus", {
-	description = S("Dino Nuggets"),
-	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
-	inventory_image = "mcl_mobitems_dino_nuggets_stegosaurus.png",
-	wield_image = "mcl_mobitems_dino_nuggets_stegosaurus.png",
-	on_place = minetest.item_eat(2),
-	on_secondary_use = minetest.item_eat(2),
-	groups = { food = 2, eatable = 2 },
-	_mcl_saturation = 2,
-	stack_max = 64,
-})
-
-minetest.register_craftitem("mcl_mobitems:dino_nuggets_brachiosaurus", {
-	description = S("Dino Nuggets"),
-	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
-	inventory_image = "mcl_mobitems_dino_nuggets_brachiosaurus.png",
-	wield_image = "mcl_mobitems_dino_nuggets_brachiosaurus.png",
-	on_place = minetest.item_eat(2),
-	on_secondary_use = minetest.item_eat(2),
-	groups = { food = 2, eatable = 2 },
-	_mcl_saturation = 2,
-	stack_max = 64,
-})
-
-minetest.register_craftitem("mcl_mobitems:dino_nuggets_trex", {
-	description = S("Dino Nuggets"),
-	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
-	inventory_image = "mcl_mobitems_dino_nuggets_trex.png",
-	wield_image = "mcl_mobitems_dino_nuggets_trex.png",
-	on_place = minetest.item_eat(2),
-	on_secondary_use = minetest.item_eat(2),
-	groups = { food = 2, eatable = 2 },
-	_mcl_saturation = 2,
-	stack_max = 64,
-})
-
-minetest.register_craft({
-	output = "mcl_mobitems:dino_nuggets_stegosaurus 6",
-	recipe = {
-		{"mcl_mobitems:cooked_chicken", "mcl_mobitems:cooked_chicken", }
-	},
-})
-
-minetest.register_craft({
-	output = "mcl_mobitems:dino_nuggets_brachiosaurus 6",
-	recipe = {
-		{"mcl_mobitems:cooked_chicken", ""},
-		{"", "mcl_mobitems:cooked_chicken"}
-	},
-})
-
-minetest.register_craft({
-	output = "mcl_mobitems:dino_nuggets_trex 6",
-	recipe = {
-		{"mcl_mobitems:cooked_chicken",},
-		{"mcl_mobitems:cooked_chicken",},
-	},
-})
-
--- END DINO NUGGETS
-
 minetest.register_craftitem("mcl_mobitems:porkchop", {
 	description = S("Raw Porkchop"),
 	_doc_items_longdesc = S("A raw porkchop is the flesh from a pig and can be eaten safely. Cooking it will greatly increase its nutritional value."),
@@ -211,13 +148,14 @@ local function drink_milk_delayed(itemstack, player, pointed_thing)
 
 	local function drink_milk(itemstack, player, pointed_thing)
 		-- Check if we were allowed to drink this (eat delay check)
-		if mcl_hunger.active and (
+		if mcl_hunger.get_active() and (
 			player:get_inventory():get_stack("main", player:get_wield_index(), itemstack) == "mcl_mobitems:milk_bucket" or
 			minetest.is_creative_enabled(player:get_player_name())
 		) then
 			mcl_hunger.stop_poison(player)
 		end
 		mcl_potions._reset_effects(player)
+		mcl_weather.skycolor.update_player_sky_color(player)
 	end
 
 	-- Wrapper for handling mcl_hunger delayed eating
@@ -334,23 +272,25 @@ minetest.register_craftitem("mcl_mobitems:earthen_ash",{
 	stack_max = 64,
 })
 
-minetest.register_craftitem("mcl_mobitems:blaze_rod", {
-	description = S("Blaze Rod"),
-	_doc_items_longdesc = S("This is a crafting component dropped from dead blazes."),
-	wield_image = "mcl_mobitems_blaze_rod.png",
-	inventory_image = "mcl_mobitems_blaze_rod.png",
+minetest.register_craftitem("mcl_mobitems:flaming_rod", {
+	description = S("Flaming Rod"),
+	_doc_items_longdesc = S("This is a crafting component dropped from dead fire elementals."),
+	wield_image = "vl_mobitems_flaming_rod.png",
+	inventory_image = "vl_mobitems_flaming_rod.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:blaze_rod", "mcl_mobitems:flaming_rod")
 
-minetest.register_craftitem("mcl_mobitems:blaze_powder", {
-	description = S("Blaze Powder"),
+minetest.register_craftitem("mcl_mobitems:flaming_powder", {
+	description = S("Flaming Powder"),
 	_doc_items_longdesc = S("This item is mainly used for crafting."),
-	wield_image = "mcl_mobitems_blaze_powder.png",
-	inventory_image = "mcl_mobitems_blaze_powder.png",
+	wield_image = "vl_mobitems_flaming_powder.png",
+	inventory_image = "vl_mobitems_flaming_powder.png",
 	groups = { craftitem = 1, brewitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:blaze_powder", "mcl_mobitems:flaming_powder")
 
 minetest.register_craftitem("mcl_mobitems:magma_cream", {
 	description = S("Magma Cream"),
@@ -375,8 +315,7 @@ minetest.register_craftitem("mcl_mobitems:nether_star", {
 	_doc_items_longdesc = S("A nether star is dropped when the Wither dies. Place it in an item frame to show the world how hardcore you are! Or just as decoration."),
 	wield_image = "mcl_mobitems_nether_star.png",
 	inventory_image = "mcl_mobitems_nether_star.png",
-	-- TODO: Reveal item when it's useful
-	groups = { craftitem = 1, not_in_creative_inventory = 1 },
+	groups = { craftitem = 1 },
 	stack_max = 64,
 })
 
@@ -398,14 +337,15 @@ minetest.register_craftitem("mcl_mobitems:feather", {
 	stack_max = 64,
 })
 
-minetest.register_craftitem("mcl_mobitems:rabbit_hide", {
-	description = S("Rabbit Hide"),
-	_doc_items_longdesc = S("Rabbit hide is used to create leather."),
-	wield_image = "mcl_mobitems_rabbit_hide.png",
-	inventory_image = "mcl_mobitems_rabbit_hide.png",
+minetest.register_craftitem("mcl_mobitems:leather_piece", {
+	description = S("Leather Piece"),
+	_doc_items_longdesc = S("Leather piece is a smaller piece of leather."),
+	wield_image = "mcl_mobitems_leather_piece.png",
+	inventory_image = "mcl_mobitems_leather_piece.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:rabbit_hide", "mcl_mobitems:leather_piece")
 
 minetest.register_craftitem("mcl_mobitems:rabbit_foot", {
 	description = S("Rabbit's Foot"),
@@ -562,14 +502,19 @@ minetest.register_craftitem("mcl_mobitems:glow_ink_sac", {
 minetest.register_craft({
 	output = "mcl_mobitems:leather",
 	recipe = {
-		{ "mcl_mobitems:rabbit_hide", "mcl_mobitems:rabbit_hide" },
-		{ "mcl_mobitems:rabbit_hide", "mcl_mobitems:rabbit_hide" },
+		{ "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece" },
+		{ "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece" },
 	}
 })
 
+core.register_craft({
+	output = "mcl_mobitems:leather_piece 4",
+	recipe = {{"mcl_mobitems:leather"}},
+})
+
 minetest.register_craft({
-	output = "mcl_mobitems:blaze_powder 2",
-	recipe = {{"mcl_mobitems:blaze_rod"}},
+	output = "mcl_mobitems:flaming_powder 2",
+	recipe = {{"mcl_mobitems:flaming_rod"}},
 })
 
 minetest.register_craft({
@@ -625,7 +570,7 @@ minetest.register_craft({
 minetest.register_craft({
 	type = "shapeless",
 	output = "mcl_mobitems:magma_cream",
-	recipe = {"mcl_mobitems:blaze_powder", "mcl_mobitems:slimeball"},
+	recipe = {"mcl_mobitems:flaming_powder", "mcl_mobitems:slimeball"},
 })
 
 minetest.register_craft({
@@ -665,7 +610,7 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "mcl_mobitems:blaze_rod",
+	recipe = "mcl_mobitems:flaming_rod",
 	burntime = 120,
 })
 

@@ -5,10 +5,10 @@ local COOK_TIME = 30 -- Time it takes to cook food on a campfire.
 
 local food_entity = {nil, nil, nil, nil}
 local campfire_spots = {
-	vector.new(-0.25, -0.04, -0.25),
-	vector.new( 0.25, -0.04, -0.25),
-	vector.new( 0.25, -0.04,  0.25),
-	vector.new(-0.25, -0.04,  0.25),
+	vector.new(-0.25, -0.03125, -0.25),
+	vector.new( 0.25, -0.03125, -0.25),
+	vector.new( 0.25, -0.03125,  0.25),
+	vector.new(-0.25, -0.03125,  0.25),
 }
 
 local drop_inventory = mcl_util.drop_items_from_meta_container("main")
@@ -39,9 +39,9 @@ local function drop_items(pos, node, oldmeta)
 				if food_entity:get_luaentity().name == "mcl_campfires:food_entity" then
 					food_entity:remove()
 					for i = 1, 4 do
-						meta:set_string("food_x_"..tostring(i), nil)
-						meta:set_string("food_y_"..tostring(i), nil)
-						meta:set_string("food_z_"..tostring(i), nil)
+						meta:set_string("food_x_"..tostring(i), "")
+						meta:set_string("food_y_"..tostring(i), "")
+						meta:set_string("food_z_"..tostring(i), "")
 					end
 				end
 			end
@@ -87,11 +87,11 @@ function mcl_campfires.take_item(pos, node, player, itemstack)
 					campfire_meta:set_string("food_x_"..tostring(space), tostring(food_entity[space]:get_pos().x))
 					campfire_meta:set_string("food_y_"..tostring(space), tostring(food_entity[space]:get_pos().y))
 					campfire_meta:set_string("food_z_"..tostring(space), tostring(food_entity[space]:get_pos().z))
+					timer:start(1) -- Start cook timer
 					break
 				end
 			end
 		end
-		timer:start(1) -- Start cook timer
 	end
 end
 
@@ -135,9 +135,9 @@ function mcl_campfires.cook_item(pos, elapsed)
 				if cooked then
 					if food_entity then
 						food_entity:remove() -- Remove visual food entity
-						meta:set_string("food_x_"..tostring(i), nil)
-						meta:set_string("food_y_"..tostring(i), nil)
-						meta:set_string("food_z_"..tostring(i), nil)
+						meta:set_string("food_x_"..tostring(i), "")
+						meta:set_string("food_y_"..tostring(i), "")
+						meta:set_string("food_z_"..tostring(i), "")
 						minetest.add_item(pos, cooked.item) -- Drop Cooked Item
 						-- Throw some Experience Points because why not?
 						-- Food is cooked, xp is deserved for using this unique cooking method. Take that Minecraft ;)
@@ -261,6 +261,14 @@ function mcl_campfires.register_campfire(name, def)
 		},
 		_mcl_blast_resistance = 2,
 		_mcl_hardness = 2,
+		_vl_projectile = {
+			on_collide = function(projectile, pos, node, node_def)
+				-- Ignite Campfires
+				if mcl_burning.is_burning(projectile) then
+					mcl_campfires.light_campfire(pos)
+				end
+			end
+		},
 		after_dig_node = function(pos, node, oldmeta, digger)
 			campfire_drops(pos, digger, def.drops, name.."_lit")
 		end,

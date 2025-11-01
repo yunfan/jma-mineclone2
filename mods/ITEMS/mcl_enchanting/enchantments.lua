@@ -1,7 +1,5 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 
--- Taken from https://minecraft.gamepedia.com/Enchanting
-
 local function increase_damage(damage_group, factor)
 	return function(itemstack, level)
 		local tool_capabilities = itemstack:get_tool_capabilities()
@@ -153,8 +151,8 @@ minetest.register_on_dignode(
 mcl_enchanting.enchantments.bane_of_arthropods = {
 	name = S("Bane of Arthropods"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {smite = true, sharpness = true},
 	weight = 5,
@@ -229,7 +227,7 @@ mcl_enchanting.enchantments.depth_strider = {
 mcl_enchanting.enchantments.efficiency = {
 	name = S("Efficiency"),
 	max_level = 5,
-	primary = {pickaxe = true, shovel = true, axe = true, hoe = true},
+	primary = {pickaxe = true, shovel = true, axe = true, hoe = true, hammer = true},
 	secondary = {shears = true},
 	disallow = {},
 	incompatible = {},
@@ -251,8 +249,8 @@ mcl_enchanting.enchantments.efficiency = {
 mcl_enchanting.enchantments.fire_aspect = {
 	name = S("Fire Aspect"),
 	max_level = 2,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {},
 	weight = 2,
@@ -398,8 +396,8 @@ mcl_enchanting.enchantments.infinity = {
 mcl_enchanting.enchantments.knockback = {
 	name = S("Knockback"),
 	max_level = 2,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, hammer = true},
+	secondary = {axe = true, spear = true},
 	disallow = {},
 	incompatible = {},
 	weight = 5,
@@ -424,7 +422,8 @@ function minetest.calculate_knockback(player, hitter, time_from_last_punch, tool
 		local wielditem = hitter:get_wielded_item()
 		--knockback = knockback + 3 * mcl_enchanting.get_enchantment(wielditem, "knockback")
 		local enchant = mcl_enchanting.get_enchantment(wielditem, "knockback")
-		knockback = knockback + 3.22 * enchant
+		local hammer = minetest.get_item_group(wielditem:get_name(), "hammer")
+		knockback = knockback + 3.22 * enchant + 3.22 * hammer
 		-- add vertical lift to knockback
 		local v = player:get_velocity()
 		local added_v = 0
@@ -495,8 +494,8 @@ end
 mcl_enchanting.enchantments.looting = {
 	name = S("Looting"),
 	max_level = 3,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, spear = true, hammer = true},
+	secondary = {axe = true},
 	disallow = {},
 	incompatible = {},
 	weight = 2,
@@ -613,6 +612,7 @@ mcl_experience.register_on_add_xp(function(player, xp)
 		local can = final_candidates[math.random(#final_candidates)]
 		local stack, list, index, wear = can.stack, can.list, can.index, can.wear
 		local uses = mcl_util.calculate_durability(stack)
+		    / (mcl_enchanting.get_enchantment(stack, "unbreaking") + 1)
 		local multiplier = 2 * 65535 / uses
 		local repair = xp * multiplier
 		local new_wear = wear - repair
@@ -768,8 +768,8 @@ mcl_enchanting.enchantments.quick_charge = {
 mcl_enchanting.enchantments.sharpness = {
 	name = S("Sharpness"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {bane_of_arthropods = true, smite = true},
 	weight = 5,
@@ -806,8 +806,8 @@ mcl_enchanting.enchantments.silk_touch = {
 mcl_enchanting.enchantments.smite = {
 	name = S("Smite"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, hammer = true},
+	secondary = {axe = true, spear = true},
 	disallow = {},
 	incompatible = {bane_of_arthropods = true, sharpness = true},
 	weight = 5,
@@ -830,7 +830,7 @@ mcl_enchanting.enchantments.soul_speed = {
 	disallow = {non_combat_armor = true},
 	incompatible = {frost_walker = true},
 	weight = 2,
-	description = S("Increases walking speed on soul sand."),
+	description = S("Increases walking speed on soul sand and soul soil."),
 	curse = false,
 	on_enchant = function() end,
 	requires_tool = false,
@@ -863,9 +863,11 @@ mcl_enchanting.enchantments.soul_speed = {
 mcl_enchanting.enchantments.unbreaking = {
 	name = S("Unbreaking"),
 	max_level = 3,
-	primary = {armor_head = true, armor_torso = true, armor_legs = true, armor_feet = true, pickaxe = true, shovel = true, axe = true, hoe = true, sword = true, fishing_rod = true, bow = true},
+	primary = {armor_head = true, armor_torso = true, armor_legs = true, armor_feet = true, pickaxe = true, shovel = true, axe = true, hoe = true, fishing_rod = true, weapon = true},
 	secondary = {tool = true},
-	disallow = {non_combat_armor = true},
+	-- Commented to allow elytra to be enchanted
+	--disallow = {non_combat_armor = true},
+	disallow = {},
 	incompatible = {},
 	weight = 5,
 	description = S("Increases item durability."),

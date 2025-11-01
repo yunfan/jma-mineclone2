@@ -18,6 +18,21 @@ local modname = minetest.get_current_modname()
 local modpath = minetest.get_modpath(modname)
 local S = minetest.get_translator(modname)
 
+-- Tunable parameters
+local notif_delay = 3
+vl_tuning.setting("award_display_time", "number", {
+	description = S("Amount of time award notification are displayed"), default = 3, min = 2, max = 10,
+	set = function(val) notif_delay = val end,
+	get = function() return notif_delay end,
+})
+local announce_in_chat = true
+vl_tuning.setting("gamerule:announceAdvancements", "bool", {
+	description = S("Whether advancements should be announced in chat"),
+	default = minetest.settings:get_bool("mcl_showAdvancementMessages", true),
+	set = function(val) announce_in_chat = val end,
+	get = function() return announce_in_chat end,
+})
+
 -- The global award namespace
 awards = {
 	show_mode = "hud",
@@ -217,7 +232,7 @@ function awards.unlock(name, award)
 
 	-- Get award
 	minetest.log("action", name.." has gotten award "..award)
-	if minetest.settings:get_bool("mcl_showAdvancementMessages", true) then
+	if announce_in_chat then
 		minetest.chat_send_all(S("@1 has made the advancement @2", name, minetest.colorize(mcl_colors.GREEN, "[" .. (awdef.title or award) .. "]")))
 	end
 	data.unlocked[award] = award
@@ -305,7 +320,7 @@ function awards.unlock(name, award)
 	else
 		local player = minetest.get_player_by_name(name)
 		local one = player:hud_add({
-			hud_elem_type = "image",
+			[mcl_vars.hud_type_field] = "image",
 			name = "award_bg",
 			scale = {x = 1.25, y = 1},
 			text = background,
@@ -325,7 +340,7 @@ function awards.unlock(name, award)
 			hud_announce = S("Advancement Made!")
 		end
 		local two = player:hud_add({
-			hud_elem_type = "text",
+			[mcl_vars.hud_type_field] = "text",
 			name = "award_au",
 			number = 0xFFFF00,
 			scale = {x = 100, y = 20},
@@ -336,7 +351,7 @@ function awards.unlock(name, award)
 			z_index = 102,
 		})
 		local three = player:hud_add({
-			hud_elem_type = "text",
+			[mcl_vars.hud_type_field] = "text",
 			name = "award_title",
 			number = 0xFFFFFF,
 			scale = {x = 100, y = 20},
@@ -351,7 +366,7 @@ function awards.unlock(name, award)
 		Yes, it's a hack, but it works for all texture sizes and is needed because the image
 		type does NOT allow us a simple scaling. ]]
 		local four = player:hud_add({
-			hud_elem_type = "statbar",
+			[mcl_vars.hud_type_field] = "statbar",
 			name = "award_icon",
 			size = {x=64, y = 64},
 			number = 2,
@@ -362,7 +377,7 @@ function awards.unlock(name, award)
 			direction = 0,
 			z_index = 102,
 		})
-		minetest.after(3, function(name)
+		minetest.after(notif_delay, function(name)
 			local player = minetest.get_player_by_name(name)
 			if not player then
 				return

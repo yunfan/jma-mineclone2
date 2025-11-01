@@ -11,21 +11,21 @@ local WOOL_REPLACE_RATE = 80
 local colors = {
 	-- group = { wool, textures }
 	unicolor_white = { "mcl_wool:white", "#FFFFFF00" },
-	unicolor_dark_orange = { "mcl_wool:brown", "#502A00D0" },
-	unicolor_grey = { "mcl_wool:silver", "#5B5B5BD0" },
+	unicolor_dark_orange = { "mcl_wool:brown", "#451A0FD0" },
+	unicolor_grey = { "mcl_wool:silver", "#7B7B7BD0" },
 	unicolor_darkgrey = { "mcl_wool:grey", "#303030D0" },
-	unicolor_blue = { "mcl_wool:blue", "#0000CCD0" },
-	unicolor_dark_green = { "mcl_wool:green", "#005000D0" },
-	unicolor_green = { "mcl_wool:lime", "#50CC00D0" },
-	unicolor_violet = { "mcl_wool:purple" , "#5000CCD0" },
-	unicolor_light_red = { "mcl_wool:pink", "#FF5050D0" },
-	unicolor_yellow = { "mcl_wool:yellow", "#CCCC00D0" },
+	unicolor_blue = { "mcl_wool:blue", "#001A9CD0" },
+	unicolor_dark_green = { "mcl_wool:green", "#004000D0" },
+	unicolor_green = { "mcl_wool:lime", "#308C20D0" },
+	unicolor_violet = { "mcl_wool:purple" , "#30107CD0" },
+	unicolor_light_red = { "mcl_wool:pink", "#BB5060D0" },
+	unicolor_yellow = { "mcl_wool:yellow", "#AC7C00D0" },
 	unicolor_orange = { "mcl_wool:orange", "#CC5000D0" },
-	unicolor_red = { "mcl_wool:red", "#CC0000D0" },
-	unicolor_cyan  = { "mcl_wool:cyan", "#00CCCCD0" },
-	unicolor_red_violet = { "mcl_wool:magenta", "#CC0050D0" },
-	unicolor_black = { "mcl_wool:black", "#000000D0" },
-	unicolor_light_blue = { "mcl_wool:light_blue", "#5050FFD0" },
+	unicolor_red = { "mcl_wool:red", "#800000D0" },
+	unicolor_cyan  = { "mcl_wool:cyan", "#004C5CD0" },
+	unicolor_red_violet = { "mcl_wool:magenta", "#90309AD0" },
+	unicolor_black = { "mcl_wool:black", "#000000E0" },
+	unicolor_light_blue = { "mcl_wool:light_blue", "#5070FFD0" },
 }
 
 local rainbow_colors = {
@@ -59,15 +59,16 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 	type = "animal",
 	spawn_class = "passive",
 	passive = true,
-	hp_min = 8,
-	hp_max = 8,
+	initial_properties = {
+		hp_min = 8,
+		hp_max = 8,
+		collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.29, 0.45},
+	},
 	xp_min = 1,
 	xp_max = 3,
-	collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.29, 0.45},
 	head_swivel = "head.control",
-	bone_eye_height = 3.3,
-	head_eye_height = 1.1,
-	horizontal_head_height=-.7,
+	head_eye_height = 1.0,
+	head_bone_position = vector.new( 0, 3.3, -.9 ), -- for minetest <= 5.8
 	curiosity = 6,
 	head_yaw="z",
 	visual = "mesh",
@@ -93,9 +94,9 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 	},
 	fear_height = 4,
 	sounds = {
-		random = "mobs_sheep",
+		random = "mobs_mc_sheep_random",
 		death = "mobs_sheep",
-		damage = "mobs_sheep",
+		damage = "mobs_mc_sheep_damage",
 		sounds = "mobs_mc_animal_eat_generic",
 		distance = 16,
 	},
@@ -150,6 +151,8 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 				self.object:set_velocity(vector.zero())
 				self.gotten = false
 				self.object:set_properties({ textures = self.base_texture })
+				minetest.sound_play({name = "mobs_mc_animal_eat_generic", gain = 0.4},
+					{pos = pos, max_hear_distance = 16}, true)
 			end
 		end)
 
@@ -200,11 +203,44 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 			self.initial_color_set = true
 		end
 
-		local is_kay27 = self.nametag == "kay27"
+        local special_names = {
+          ["AFCMS"] = true,
+          ["AncientMariner"] = true,
+          ["chmodsayshello"] = true,
+          ["Codiac"] = true,
+          ["cora"] = true,
+          ["davedevils"] = true,
+          ["DarkReaven"] = true,
+          ["Diminixed"] = true,		 		 		  
+          ["epCode"] = true,
+          ["Exhale&TimUnwin"] = true,
+          ["Faerraven"] = true,
+          ["Fleckenstein"] = true,
+          ["FossFanatic"] = true,
+          ["Herowl"] = true,
+          ["iliekprogrammar"] = true,
+          ["Jester"] = true,
+          ["Jordach"] = true,
+          ["jordan4ibanez"] = true,
+          ["kabou"] = true,
+          ["kay27"] = true,
+          ["kno10"] = true,
+          ["MrRar"] = true,
+		  ["MysticTempest"] = true,
+          ["Nicu"] = true,
+          ["NO11"] = true,
+          ["PrairieWind"] = true,
+          ["rudzik8"] = true,
+          ["SmokeyDope"] = true,
+          ["SumianVoice"] = true,
+          ["teknomunk"] = true,
+          ["Wuzzy"] = true,
+}
+        local is_special_name = special_names[self.nametag] ~= nil
 
 		if self.color_change_timer then
 			local old_color = self.color
-			if is_kay27 then
+			if is_special_name then
 				self.color_change_timer = self.color_change_timer - dtime
 				if self.color_change_timer < 0 then
 					self.color_change_timer = 0.5
@@ -221,7 +257,7 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 				self.base_texture = sheep_texture(self.color)
 				self.object:set_properties({textures = self.base_texture})
 			end
-		elseif is_kay27 then
+		elseif is_special_name then
 			self.initial_color = self.color
 			self.color_change_timer = 0
 			self.color_index = -1
@@ -334,56 +370,62 @@ mcl_mobs.register_mob("mobs_mc:sheep", {
 			return false
 		end
 	end,
+	after_activate = function(self)
+		if self.gotten then return end
+		self.base_texture = sheep_texture(self.color)
+		self.object:set_properties({textures = self.base_texture})
+	end,
 })
-mcl_mobs:spawn_specific(
-"mobs_mc:sheep",
-"overworld",
-"ground",
-{
-	"flat",
-	"IcePlainsSpikes",
-	"ColdTaiga",
-	"ColdTaiga_beach",
-	"ColdTaiga_beach_water",
-	"MegaTaiga",
-	"MegaSpruceTaiga",
-	"ExtremeHills",
-	"ExtremeHills_beach",
-	"ExtremeHillsM",
-	"ExtremeHills+",
-	"ExtremeHills+_snowtop",
-	"StoneBeach",
-	"Plains",
-	"Plains_beach",
-	"SunflowerPlains",
-	"Taiga",
-	"Taiga_beach",
-	"Forest",
-	"Forest_beach",
-	"FlowerForest",
-	"FlowerForest_beach",
-	"BirchForest",
-	"BirchForestM",
-	"RoofedForest",
-	"Savanna",
-	"Savanna_beach",
-	"SavannaM",
-	"Jungle",
-	"Jungle_shore",
-	"JungleM",
-	"JungleM_shore",
-	"JungleEdge",
-	"JungleEdgeM",
-	"Swampland",
-	"Swampland_shore"
-},
-9,
-minetest.LIGHT_MAX+1,
-30,
-120,
-3,
-mcl_vars.mg_overworld_min,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:sheep",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"flat",
+		"IcePlainsSpikes",
+		"ColdTaiga",
+		"ColdTaiga_beach",
+		"ColdTaiga_beach_water",
+		"MegaTaiga",
+		"MegaSpruceTaiga",
+		"ExtremeHills",
+		"ExtremeHills_beach",
+		"ExtremeHillsM",
+		"ExtremeHills+",
+		"ExtremeHills+_snowtop",
+		"StoneBeach",
+		"Plains",
+		"Plains_beach",
+		"SunflowerPlains",
+		"Taiga",
+		"Taiga_beach",
+		"Forest",
+		"Forest_beach",
+		"FlowerForest",
+		"FlowerForest_beach",
+		"BirchForest",
+		"BirchForestM",
+		"RoofedForest",
+		"Savanna",
+		"Savanna_beach",
+		"SavannaM",
+		"Jungle",
+		"Jungle_shore",
+		"JungleM",
+		"JungleM_shore",
+		"JungleEdge",
+		"JungleEdgeM",
+		"Swampland",
+		"Swampland_shore"
+	},
+	min_light = 9,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 120,
+	interval = 30,
+	aoc = 3,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:sheep", S("Sheep"), "#e7e7e7", "#ffb5b5", 0)

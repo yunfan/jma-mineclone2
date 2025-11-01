@@ -6,43 +6,45 @@
 ## Creator of VoxeLibre
 * Wuzzy
 
-## Maintainers
-* AncientMariner
+## Maintainer
 * Herowl
 
 ## Previous Maintainers
 * Fleckenstein
+* kay27
 * cora
 * Nicu
+* AncientMariner
 
 ## Developers
 * AFCMS
 * epCode
-* chmodsayshello
-* MrRar
-* SmokeyDope
+* TomCon / SmokeyDope
 * Faerraven / Michieal
-* rudzik8
 * teknomunk
+* AncientMariner
 
 ## Past Developers
 * jordan4ibanez
+* ryvnf
 * iliekprogrammar
 * kabou
-* kay27
 * MysticTempest
 * NO11
 * SumianVoice
 * PrairieWind
 * FossFanatic
 * Codiac
+* chmodsayshello
+* MrRar
+* rudzik8
+* kno10
 
 ## Contributors
 * RandomLegoBrick
 * Code-Sploit
 * aligator
 * Rootyjr
-* ryvnf
 * bzoss
 * talamh
 * Laurent Rocher
@@ -71,7 +73,7 @@
 * Tianyang Zhang
 * j45
 * Marcin Serwin
-* erlehmann
+* erle
 * E
 * n_to
 * debiankaios
@@ -141,6 +143,32 @@
 * Bram
 * qoheniac
 * WillConker
+* 0ldude
+* tacotexmex
+* Pixel-Peter
+* OgelGames
+* blitzdoughnuts
+* goodspeed
+* Bloodaxe
+* ClementMR
+* THE-NERD2
+* ethan
+* villager8472
+* ninjum
+* OpenSauce04
+* grillo-delmal
+* Yoric
+* potatoalienof13
+* HalfShadow111
+* cyberonkel
+* oku
+* fancyfinn9
+* Chiragon
+* Archie
+* newrizen
+* wrrrzr
+* antimundo
+* farfind
 
 ## Music
 * Jordach for the jukebox music compilation from Big Freaking Dig
@@ -185,6 +213,7 @@
 * Faerraven / Michieal
 * PrairieWind
 * ChrisPHP
+* rudzik8
 
 ## 3D Models
 * 22i
@@ -193,6 +222,8 @@
 * Faerraven / Michieal
 * SumianVoice
 * thunder1035
+* Herowl
+* Chiragon
 
 ## Textures
 * XSSheep
@@ -214,6 +245,10 @@
 * SmokeyDope
 * thunder1035
 * Herowl
+* NovaWostra
+* rudzik8
+* kno10
+* Chiragon
 
 ## Translations
 * Wuzzy
@@ -237,6 +272,18 @@
 * ADLON
 * Sab Pyrope
 * JoseDouglas26
+* 0ldude
+* Bloodaxe
+* ethan
+* Herowl
+* kno10
+* Pixel-Peter
+* Laudrin
+* chmodsayshello
+* ninjum
+* HalfShadow111
+* newrizen
+* antimundo
 
 ## Funders
 * 40W
@@ -244,6 +291,6 @@
 * Cora
 
 ## Special thanks
-* The Minetest team for making and supporting an engine, and distribution infrastructure that makes this all possible
+* The Luanti team for making and supporting an engine, and distribution infrastructure that makes this all possible
 * The workaholics who spent way too much time writing for the Minecraft Wiki. It's an invaluable resource for creating this game
 * Notch and Jeb for being the major forces behind Minecraft

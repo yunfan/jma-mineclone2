@@ -6,10 +6,9 @@ local translucent_ice = minetest.settings:get_bool("mcl_translucent_ice", false)
 local ice_drawtype, ice_texture_alpha
 if translucent_ice then
 	ice_drawtype = "glasslike"
-	ice_texture_alpha = minetest.features.use_texture_alpha_string_modes and "blend" or true
+	ice_texture_alpha = "blend"
 else
 	ice_drawtype = "normal"
-	ice_texture_alpha = minetest.features.use_texture_alpha_string_modes and "opaque" or false
 end
 
 mcl_core.fortune_drop_ore = {
@@ -288,7 +287,7 @@ minetest.register_node("mcl_core:stone_smooth", {
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	is_ground_content = false,
 	_mcl_blast_resistance = 6,
-	_mcl_hardness = 1.5,
+	_mcl_hardness = 2,
 })
 
 minetest.register_node("mcl_core:granite", {
@@ -370,7 +369,7 @@ minetest.register_node("mcl_core:dirt_with_grass", {
 	_doc_items_hidden = false,
 	paramtype2 = "color",
 	tiles = {"mcl_core_grass_block_top.png", { name="default_dirt.png", color="white" }, { name="default_dirt.png^mcl_dirt_grass_shadow.png", color="white" }},
-	overlay_tiles = {"mcl_core_grass_block_top.png", "blank.png", {name="mcl_core_grass_block_side_overlay.png", tileable_vertical=false}},
+	overlay_tiles = {"", "", {name="mcl_core_grass_block_side_overlay.png", tileable_vertical=false}},
 	palette = "mcl_core_palette_grass.png",
 	palette_index = 0,
 	color = "#7CBD6B",
@@ -389,9 +388,10 @@ minetest.register_node("mcl_core:dirt_with_grass", {
 	on_construct = function(pos)
 		local node = minetest.get_node(pos)
 		if node.param2 == 0 then
-			local new_node = mcl_core.get_grass_block_type(pos)
-			if new_node.param2 ~= 0 or new_node.name ~= "mcl_core:dirt_with_grass" then
-				minetest.set_node(pos, new_node)
+			local p2 = mcl_util.get_palette_indexes_from_pos(pos).grass_palette_index
+			if node.param2 ~= p2 then
+				node.param2 = p2
+				minetest.swap_node(pos, node)
 			end
 		end
 		return mcl_core.on_snowable_construct(pos)
@@ -409,7 +409,6 @@ minetest.register_node("mcl_core:grass_path", {
 	_doc_items_longdesc = S("Grass paths are a decorative variant of grass blocks. Their top has a different color and they are a bit lower than grass blocks, making them useful to build footpaths. Grass paths can be created by right clicking with a shovel. A grass path turns into dirt when it is below a solid block or when shift+right clicked with a shovel."),
 	drop = "mcl_core:dirt",
 	is_ground_content = true,
-	use_texture_alpha = minetest.features.use_texture_alpha_string_modes and "opaque" or false,
 	drawtype = "nodebox",
 	paramtype = "light",
 	node_box = {
@@ -424,7 +423,7 @@ minetest.register_node("mcl_core:grass_path", {
 		footstep = {name="default_grass_footstep", gain=0.1},
 	}),
 	_mcl_blast_resistance = 0.65,
-	_mcl_hardness = 0.6,
+	_mcl_hardness = 0.65,
 })
 
 -- TODO: Add particles
@@ -497,8 +496,8 @@ minetest.register_node("mcl_core:podzol", {
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	on_construct = mcl_core.on_snowable_construct,
 	_mcl_snowed = "mcl_core:podzol_snow",
-	_mcl_blast_resistance = 0.8,
-	_mcl_hardness = 0.8,
+	_mcl_blast_resistance = 0.5,
+	_mcl_hardness = 0.5,
 	_mcl_silk_touch_drop = true,
 })
 mcl_core.register_snowed_node("mcl_core:podzol_snow", "mcl_core:podzol", nil, nil, false, S("Podzol with Snow"))
@@ -563,6 +562,20 @@ minetest.register_node("mcl_core:gravel", {
 		},
 		[3] = "mcl_core:flint",
 	},
+	_vl_crushing_drop = { "mcl_core:greysand" },
+})
+
+minetest.register_node("mcl_core:greysand", {
+	description = S("Grey Sand"),
+	_doc_items_longdesc = S("Grey sand is found where stone erosion takes place."),
+	_doc_items_hidden = false,
+	tiles = {"mcl_core_grey_sand.png"},
+	is_ground_content = true,
+	stack_max = 64,
+	groups = {handy=1,shovely=1, falling_node=1, sand=1, soil_sugarcane=1, enderman_takable=1, building_block=1, material_sand=1},
+	sounds = mcl_sounds.node_sound_sand_defaults(),
+	_mcl_blast_resistance = 0.5,
+	_mcl_hardness = 0.5,
 })
 
 -- sandstone --
@@ -590,6 +603,7 @@ minetest.register_node("mcl_core:sandstone", {
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 0.8,
 	_mcl_hardness = 0.8,
+	_vl_crushing_drop = { "mcl_core:sand" },
 })
 
 minetest.register_node("mcl_core:sandstonesmooth", {
@@ -600,8 +614,8 @@ minetest.register_node("mcl_core:sandstonesmooth", {
 	stack_max = 64,
 	groups = {pickaxey=1, sandstone=1, normal_sandstone=1, building_block=1, material_stone=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
-	_mcl_blast_resistance = 6,
-	_mcl_hardness = 2,
+	_mcl_blast_resistance = 0.8,
+	_mcl_hardness = 0.8,
 })
 
 minetest.register_node("mcl_core:sandstonecarved", {
@@ -653,6 +667,7 @@ minetest.register_node("mcl_core:redsandstone", {
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 0.8,
 	_mcl_hardness = 0.8,
+	_vl_crushing_drop = { "mcl_core:redsand" },
 })
 
 minetest.register_node("mcl_core:redsandstonesmooth", {
@@ -687,8 +702,8 @@ minetest.register_node("mcl_core:redsandstonesmooth2", {
 	stack_max = 64,
 	groups = {pickaxey=1, sandstone=1, red_sandstone=1, building_block=1, material_stone=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
-	_mcl_blast_resistance = 0.8,
-	_mcl_hardness = 0.8,
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 2,
 })
 
 ---
@@ -728,7 +743,7 @@ minetest.register_node("mcl_core:bedrock", {
 		S("In the End dimension, starting a fire on this block will create an eternal fire."),
 	tiles = {"mcl_core_bedrock.png"},
 	stack_max = 64,
-	groups = {creative_breakable=1, building_block=1, material_stone=1},
+	groups = {creative_breakable=1, building_block=1, material_stone=1, unbreakable=1},
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	is_ground_content = false,
 	on_blast = function() end,
@@ -772,6 +787,7 @@ minetest.register_node("mcl_core:cobble", {
 	sounds = mcl_sounds.node_sound_stone_defaults(),
 	_mcl_blast_resistance = 6,
 	_mcl_hardness = 2,
+	_vl_crushing_drop = { "mcl_core:gravel" }
 })
 
 minetest.register_node("mcl_core:mossycobble", {
@@ -798,6 +814,18 @@ minetest.register_node("mcl_core:coalblock", {
 	_mcl_hardness = 5,
 })
 
+minetest.register_node("mcl_core:charcoalblock", {
+	description = S("Block of Charcoal"),
+	_doc_items_longdesc = S("Blocks of charcoal are useful as a compact storage of charcoal and very useful as a furnace fuel. A block of charcoal is as efficient as 10 charcoal."),
+	tiles = {"mcl_core_charcoal_block.png"},
+	is_ground_content = false,
+	stack_max = 64,
+	groups = {pickaxey=1, flammable=1, building_block=1, material_stone=1, fire_encouragement=5, fire_flammability=5},
+	sounds = mcl_sounds.node_sound_stone_defaults(),
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 5,
+})
+
 minetest.register_node("mcl_core:ironblock", {
 	description = S("Block of Iron"),
 	_doc_items_longdesc = S("A block of iron is mostly a decorative block but also useful as a compact storage of iron ingots."),
@@ -814,6 +842,18 @@ minetest.register_node("mcl_core:goldblock", {
 	description = S("Block of Gold"),
 	_doc_items_longdesc = S("A block of gold is mostly a shiny decorative block but also useful as a compact storage of gold ingots."),
 	tiles = {"default_gold_block.png"},
+	is_ground_content = false,
+	stack_max = 64,
+	groups = {pickaxey=4, building_block=1},
+	sounds = mcl_sounds.node_sound_metal_defaults(),
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 3,
+})
+
+minetest.register_node("mcl_core:goldblock_polished", {
+	description = S("Polished Block of Gold"),
+	_doc_items_longdesc = S("A polished block of gold is mostly a shiny decorative block but also useful as a compact storage of gold ingots."),
+	tiles = {"mcl_gold_block_polished.png"},
 	is_ground_content = false,
 	stack_max = 64,
 	groups = {pickaxey=4, building_block=1},
@@ -1051,7 +1091,15 @@ for i=1,8 do
 			local itemstring = itemstack:get_name()
 			local itemcount = itemstack:get_count()
 			local fakestack = ItemStack(itemstring.." "..itemcount)
-			fakestack:set_name("mcl_core:snow_"..math.min(8, (i+g)))
+			if i+g < 8 then
+				fakestack:set_name("mcl_core:snow_"..(i+g))
+			else
+				-- To stack `mcl_core:snow_8', just replacing it with `mcl_core:snowblock' Issue#4483
+				if i+g == 9 then
+				   fakestack:set_count(itemcount + 1)
+				end
+				fakestack:set_name("mcl_core:snowblock")
+			end
 			itemstack = minetest.item_place(fakestack, placer, pointed_thing)
 			minetest.sound_play(mcl_sounds.node_sound_snow_defaults().place, {pos = pointed_thing.under}, true)
 			itemstack:set_name(itemstring)
@@ -1095,7 +1143,7 @@ for i=1,8 do
 			mcl_core.clear_snow_dirt(npos, node)
 		end,
 		node_box = node_box,
-		groups = {shovely=2, attached_node=1,deco_block=1, dig_by_piston=1, snow_cover=1, top_snow=i},
+		groups = {shovely=2, supported_node=1, deco_block=1, dig_by_piston=1, snow_cover=1, top_snow=i},
 		sounds = mcl_sounds.node_sound_snow_defaults(),
 		on_construct = mcl_core.on_snow_construct,
 		on_place = on_place,
@@ -1119,8 +1167,8 @@ minetest.register_node("mcl_core:snowblock", {
 	on_construct = mcl_core.on_snow_construct,
 	after_destruct = mcl_core.after_snow_destruct,
 	drop = "mcl_throwing:snowball 4",
-	_mcl_blast_resistance = 0.1,
-	_mcl_hardness = 0.1,
+	_mcl_blast_resistance = 0.2,
+	_mcl_hardness = 0.2,
 	_mcl_silk_touch_drop = true,
 })
 

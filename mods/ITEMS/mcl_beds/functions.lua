@@ -10,6 +10,8 @@ local explosions_mod = minetest.get_modpath("mcl_explosions")
 local spawn_mod = minetest.get_modpath("mcl_spawn")
 local pos_to_dim = minetest.get_modpath("mcl_worlds") and mcl_worlds.pos_to_dimension or function(pos) return "overworld" end
 
+local gamerule_respawnBlocksExplode = vl_tuning.setting("gamerule:respawnBlocksExplode")
+
 local function mcl_log (message)
 	mcl_util.mcl_log (message, "[Beds]")
 end
@@ -78,7 +80,7 @@ function mcl_beds.is_night(tod)
 		tod = minetest.get_timeofday()
 	end
 	tod = ( tod * 24000 ) % 24000
-	return  tod > 18541 or tod < 5458
+	return  tod > 18000 or tod < 5458
 end
 
 local function lay_down(player, pos, bed_pos, state, skip)
@@ -119,7 +121,7 @@ local function lay_down(player, pos, bed_pos, state, skip)
 		end
 
 		-- No sleeping while moving. Slightly different behaviour than in MC.
-		-- FIXME: Velocity threshold should be 0.01 but Minetest 5.3.0
+		-- FIXME: Velocity threshold should be 0.01 but Luanti 5.3.0
 		-- sometimes reports incorrect Y speed. A velocity threshold
 		-- of 0.125 still seems good enough.
 		if vector.length(player:get_velocity() or player:get_player_velocity()) > 0.125 then
@@ -246,11 +248,11 @@ local function update_formspecs(finished, players)
 			form_n = form_n .. bg_sleep
 			form_n = form_n .. button_abort
 		else
-			local comment = "You will fall asleep when "
+			local comment
 			if players_in_bed_setting() == 100 then
-				comment = S(comment .. "all players are in bed.")
+				comment = S("You will fall asleep when all players are in bed.")
 			else
-				comment = S(comment .. "@1% of all players are in bed.", players_in_bed_setting())
+				comment = S("You will fall asleep when @1% of all players are in bed.", players_in_bed_setting())
 			end
 			text = text .. "\n" .. comment
 			form_n = form_n .. bg_presleep
@@ -384,7 +386,7 @@ function mcl_beds.on_rightclick(pos, player, is_top)
 
 		minetest.remove_node(pos)
 		minetest.remove_node(string.sub(node.name, -4) == "_top" and vector.subtract(pos, dir) or vector.add(pos, dir))
-		if explosions_mod then
+		if explosions_mod and gamerule_respawnBlocksExplode.getter() then
 			mcl_explosions.explode(pos, 5, {drop_chance = 1.0, fire = true})
 		end
 		return
@@ -505,17 +507,25 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		custom_sleep_message = fields.chatmessage
 	end
 
+	local player_name = player:get_player_name()
 	if custom_sleep_message or fields.defaultmessage then
 		if chatbuttonused then
 			local time_to_wait = math.ceil(10-globalstep_timer)
-			minetest.chat_send_player(player:get_player_name(),S("Sorry, but you have to wait @1 seconds until you may use this button again!", tostring(time_to_wait)))
+			minetest.chat_send_player(player_name,S("Sorry, but you have to wait @1 seconds until you may use this button again!", tostring(time_to_wait)))
 			return
 		end
-
-		if (not exceeded_rate_limit(player:get_player_name())) and shout_priv_check(player) then
+		local player_xban_entry
+		if xban then
+			player_xban_entry = xban.find_entry(player_name)
+		end
+		if (not exceeded_rate_limit(player_name)) and (shout_priv_check(player)) and (player_xban_entry and (player_xban_entry.muted ~= true)) then
 			chatbuttonused = true
 			local message = custom_sleep_message or S("Hey! Would you guys mind sleeping?")
-			minetest.chat_send_all(minetest.format_chat_message(player:get_player_name(), message))
+			if block_msgs then
+				block_msgs.chat_send_all(player_name, minetest.format_chat_message(player_name, message))
+			else
+				minetest.chat_send_all(minetest.format_chat_message(player_name, message))
+			end
 		end
 		return
 	end
